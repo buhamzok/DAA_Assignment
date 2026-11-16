@@ -1,4 +1,4 @@
-/* Member 3: recursion algorithms.
+/* MULINDWA EMMANUEL S25B23/059: recursion algorithms.
  *
  * Four recursive algorithms, each one logging every call, return value and
  * base case into the shared Recorder so the browser shows the call stack
