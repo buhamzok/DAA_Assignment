@@ -1,15 +1,17 @@
 # Algorithm Explorer
 
-This package is ready for assessment. It has the full web application,
-browser interface, automated tests, report, references, and build instructions.
+It has the full web application, browser interface, automated tests, report, references, and build instructions.
 
 ## Quick start (Windows / MinGW)
 
-text
+Text
 
 cd DAA_Assignment
+
 mingw32-make
+
 mingw32-make test
+
 algorithm_explorer.exe
 
 
