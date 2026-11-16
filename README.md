@@ -1,15 +1,30 @@
+# GROUP MEMBERS
+Group 5
+MULINDWA EMMANUEL S25B23/059
+BUHAMIZO ELIJAH K
+S25B23/064
+WANDEBA GLEN JEREMOTH S25B23/105
+MWALE CHRISTIAN PAUL S25B23/036
+ABENAITWE PAUL
+M25B23/058
+MUGABI JEREMY 
+S25B23/011
+
+
 # Algorithm Explorer
 
-This package is ready for assessment. It has the full web application,
-browser interface, automated tests, report, references, and build instructions.
+It has the full web application, browser interface, automated tests, report, references, and build instructions.
 
 ## Quick start (Windows / MinGW)
 
-text
+Text
 
 cd DAA_Assignment
+
 mingw32-make
+
 mingw32-make test
+
 algorithm_explorer.exe
 
 
