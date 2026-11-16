@@ -1,37 +1,24 @@
-# DAA_Assignment
+# Algorithm Explorer
 
-Algorithm Explorer: a C web application that runs algorithms on user input and
-shows the result, the steps taken, the number of operations and the running time.
+This package is ready for assessment. It has the full web application,
+browser interface, automated tests, report, references, and build instructions.
 
-## Build
+## Quick start (Windows / MinGW)
 
-Requires a C99 compiler (gcc, clang or MSVC via clang).
+text
 
-    make
+cd DAA_Assignment
+mingw32-make
+mingw32-make test
+algorithm_explorer.exe
 
-On Windows the Makefile links ws2_32 automatically (MinGW/gcc).
 
-## Run
+Open http://localhost:8080 in a browser.
 
-    make run
+## Contents
 
-Then open http://localhost:8080 in a browser.
+- DAA_Assignment/ — build files, C server, report, and automated tests.
+- modules/ — hand-written data structures, recursion, sorting, benchmark,
+  timing utilities, and browser interface.
 
-## Project layout
-
-    src/server.c   socket listener, routing, static file serving
-    src/http.c/.h  HTTP request parsing and response helpers
-    src/json.c/.h  JSON response builder
-    src/ds/        data structures (stack, queue, list, step recorder)
-    src/algo/      recursion and sorting algorithms
-    src/metrics/   timing and benchmark code
-    www/           browser front end
-    report/        explanation document
-    tests/         test scripts
-
-## API
-
-    GET  /api/health   server status
-    POST /api/echo     echoes the posted JSON body
-
-More endpoints are added as algorithm modules land.
+The project has no compiled executables or object files in this package.
