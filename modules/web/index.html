@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Algorithm Explorer</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header>
+  <h1>Algorithm Explorer</h1>
+  <p>Type input, run the algorithm, see the result, the steps, the operation count and the running time.</p>
+</header>
+
+<nav>
+  <button data-panel="recursion" class="active">Recursion</button>
+  <button data-panel="sorting">Sorting</button>
+  <button data-panel="benchmark">Benchmark</button>
+</nav>
+
+<!-- Recursion panel -->
+<section id="panel-recursion" class="panel active">
+  <h2>Recursive algorithms</h2>
+  <form id="form-recursion">
+    <label>Algorithm
+      <select name="algorithm">
+        <option value="factorial">factorial (n!)</option>
+        <option value="fibonacci">fibonacci, naive recursion</option>
+        <option value="fibonacci_memo">fibonacci, memoization</option>
+        <option value="hanoi">towers of hanoi (move count)</option>
+      </select>
+    </label>
+    <label>n
+      <input type="number" name="input" min="0" max="90" value="10" required>
+    </label>
+    <button type="submit">Run</button>
+  </form>
+  <div id="recursion-result" class="result"></div>
+</section>
+
+<!-- Sorting panel -->
+<section id="panel-sorting" class="panel">
+  <h2>Sorting algorithms</h2>
+  <form id="form-sorting">
+    <label>Algorithm
+      <select name="algorithm">
+        <option value="bubble">bubble sort</option>
+        <option value="insertion">insertion sort</option>
+        <option value="selection">selection sort</option>
+        <option value="merge">merge sort</option>
+        <option value="quick">quick sort</option>
+        <option value="heap">heap sort</option>
+      </select>
+    </label>
+    <label>Numbers (comma separated)
+      <input type="text" name="input" value="5,2,9,1,7" required>
+    </label>
+    <button type="submit">Sort</button>
+  </form>
+  <div id="sorting-result" class="result"></div>
+</section>
+
+<!-- Benchmark panel -->
+<section id="panel-benchmark" class="panel">
+  <h2>Benchmark</h2>
+  <p>Runs the algorithms on random inputs of growing size and measures operations and wall clock time.</p>
+  <form id="form-benchmark">
+    <label>Family
+      <select name="family">
+        <option value="sorting">sorting family (6 algorithms)</option>
+        <option value="recursion">recursion family (3 algorithms)</option>
+      </select>
+    </label>
+    <label>Sizes (comma separated)
+      <input type="text" name="sizes" value="100,200,400" required>
+    </label>
+    <button type="submit">Benchmark</button>
+  </form>
+  <div id="benchmark-result" class="result"></div>
+</section>
+
+<script src="app.js"></script>
+</body>
+</html>
