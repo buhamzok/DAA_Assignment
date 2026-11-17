@@ -1,3 +1,4 @@
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -69,6 +70,17 @@ long long recursion_factorial(Recorder *r, long long n)
     return rec_factorial(r, n, 0);
 }
 
+long long recursion_factorial_iterative(Recorder *r, long long n)
+{
+    long long result = 1;
+    for (long long i = 2; i <= n; i++) {
+        result *= i;
+        recorder_count_op(r, 1);
+        recorder_log(r, "multiply result by %lld -> %lld", i, result);
+    }
+    return result;
+}
+
 long long recursion_fib_naive(Recorder *r, long long n)
 {
     return rec_fib_naive(r, n, 0);
@@ -88,6 +100,25 @@ long long recursion_fib_memo(Recorder *r, long long n)
     result = rec_fib_memo(r, n, memo, 0);
     free(memo);
     return result;
+}
+
+long long recursion_fib_bottom_up(Recorder *r, long long n)
+{
+    if (n <= 1) {
+        recorder_log(r, "base case fib(%lld) = %lld", n, n);
+        recorder_count_op(r, 1);
+        return n;
+    }
+    long long previous = 0;
+    long long current = 1;
+    for (long long i = 2; i <= n; i++) {
+        long long next = previous + current;
+        recorder_count_op(r, 1);
+        recorder_log(r, "fib(%lld) = %lld + %lld = %lld", i, previous, current, next);
+        previous = current;
+        current = next;
+    }
+    return current;
 }
 
 long long recursion_hanoi(Recorder *r, long long n)
@@ -122,6 +153,12 @@ int algo_recursion_handle(const char *body, json_buf *out, int *status)
         } else {
             result = rec_factorial(&r, input, 0);
         }
+    } else if (strcmp(algo, "factorial_iterative") == 0) {
+        if (input < 0 || input > 20) {
+            handled = 0;
+        } else {
+            result = recursion_factorial_iterative(&r, input);
+        }
     } else if (strcmp(algo, "fibonacci") == 0) {
         if (input < 0 || input > 25) {
             handled = 0;
@@ -133,6 +170,12 @@ int algo_recursion_handle(const char *body, json_buf *out, int *status)
             handled = 0;
         } else {
             result = recursion_fib_memo(&r, input);
+        }
+    } else if (strcmp(algo, "fibonacci_bottom_up") == 0) {
+        if (input < 0 || input > 90) {
+            handled = 0;
+        } else {
+            result = recursion_fib_bottom_up(&r, input);
         }
     } else if (strcmp(algo, "hanoi") == 0) {
         if (input < 1 || input > 15) {

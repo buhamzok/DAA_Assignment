@@ -1,3 +1,22 @@
+/* Hand-written sorting algorithms.
+ *
+ * Six classic sorts on plain int arrays. Every comparison and swap goes
+ * through the Recorder so the front end can replay the algorithm move by
+ * move and the operation count is visible. No qsort, no library sort.
+ *
+ *   bubble     adjacent swaps, O(n^2)
+ *   insertion  shift into sorted prefix, O(n^2) but fast on nearly sorted
+ *   selection  pick minimum of the rest, O(n^2)
+ *   merge      divide and conquer with a temp buffer, O(n log n)
+ *   quick      partition around pivot, O(n log n) average
+ *   heap       max-heap built in place, O(n log n)
+ *
+ * Endpoint handled here: POST /api/sort with body
+ *   {"algorithm":"merge","input":[5,3,1]}
+ * Response: {"algorithm":..,"input":[..],"sorted":[..],"operations":..,
+ *            "comparisons":..,"swaps":..,"running_time_ms":..,"steps":[..]}
+ */
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -13,6 +32,7 @@ static void sort_insertion(Recorder *r, int *arr, size_t n);
 static void sort_selection(Recorder *r, int *arr, size_t n);
 static void sort_merge(Recorder *r, int *arr, size_t n);
 static void sort_quick(Recorder *r, int *arr, size_t n);
+static void sort_quick_random(Recorder *r, int *arr, size_t n);
 static void sort_heap(Recorder *r, int *arr, size_t n);
 
 static void (*sort_lookup(const char *name))(Recorder *, int *, size_t)
@@ -22,6 +42,7 @@ static void (*sort_lookup(const char *name))(Recorder *, int *, size_t)
     if (strcmp(name, "selection") == 0) return sort_selection;
     if (strcmp(name, "merge") == 0)     return sort_merge;
     if (strcmp(name, "quick") == 0)     return sort_quick;
+    if (strcmp(name, "quick_random") == 0) return sort_quick_random;
     if (strcmp(name, "heap") == 0)      return sort_heap;
     return NULL;
 }
@@ -183,35 +204,56 @@ static void sort_merge(Recorder *r, int *arr, size_t n)
     }
 }
 
-static void sort_quick_rec(Recorder *r, int *arr, long long low, long long high)
+static unsigned long quick_seed = 2463534242UL;
+
+static unsigned long quick_next_random(void)
+{
+    quick_seed = quick_seed * 1103515245UL + 12345UL;
+    return quick_seed;
+}
+
+static void sort_quick_rec(Recorder *r, int *arr, long long low, long long high, int randomized)
 {
     if (low >= high) {
         return;
     }
-    int pivot = arr[high];
-    recorder_log(r, "partition [%lld..%lld] pivot %d", low, high, pivot);
-    long long i = low - 1;
-    for (long long j = low; j < high; j++) {
+    if (randomized) {
+        long long chosen = low + (long long)(quick_next_random() % (unsigned long)(high - low + 1));
+        swap_log(r, &arr[low], &arr[chosen], arr, 0);
+        recorder_log(r, "randomized pivot: move a[%lld] to first position", chosen);
+    }
+    int pivot = arr[low];
+    recorder_log(r, "partition [%lld..%lld] first-element pivot %d", low, high, pivot);
+    long long i = low + 1;
+    for (long long j = low + 1; j <= high; j++) {
         compare_log(r, arr[j], pivot);
         recorder_log(r, "compare a[%lld]=%d with pivot %d", j, arr[j], pivot);
         if (arr[j] < pivot) {
-            i++;
             swap_log(r, &arr[i], &arr[j], arr, 0);
             recorder_log(r, "swap a[%lld] and a[%lld]", i, j);
+            i++;
         }
     }
-    swap_log(r, &arr[i + 1], &arr[high], arr, 0);
-    recorder_log(r, "place pivot at position %lld", i + 1);
+    swap_log(r, &arr[low], &arr[i - 1], arr, 0);
+    recorder_log(r, "place pivot at position %lld", i - 1);
 
-    sort_quick_rec(r, arr, low, i);
-    sort_quick_rec(r, arr, i + 2, high);
+    sort_quick_rec(r, arr, low, i - 2, randomized);
+    sort_quick_rec(r, arr, i, high, randomized);
 }
 
 static void sort_quick(Recorder *r, int *arr, size_t n)
 {
     recorder_log(r, "quick sort on %zu elements", n);
     if (n > 0) {
-        sort_quick_rec(r, arr, 0, (long long)n - 1);
+        sort_quick_rec(r, arr, 0, (long long)n - 1, 0);
+    }
+}
+
+static void sort_quick_random(Recorder *r, int *arr, size_t n)
+{
+    recorder_log(r, "randomized-pivot quick sort on %zu elements", n);
+    if (n > 0) {
+        sort_quick_rec(r, arr, 0, (long long)n - 1, 1);
     }
 }
 
@@ -365,4 +407,3 @@ int main(void)
 }
 
 #endif
-

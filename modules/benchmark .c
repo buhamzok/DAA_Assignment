@@ -50,11 +50,23 @@ static void fill_random(int *arr, size_t n)
     }
 }
 
+static void fill_input(int *arr, size_t n, const char *input_type)
+{
+    if (strcmp(input_type, "sorted") == 0) {
+        for (size_t i = 0; i < n; i++) arr[i] = (int)i;
+    } else if (strcmp(input_type, "reverse") == 0) {
+        for (size_t i = 0; i < n; i++) arr[i] = (int)(n - i);
+    } else {
+        fill_random(arr, n);
+    }
+}
+
 static const char *SORT_NAMES[] = {
     "bubble", "insertion", "selection", "merge", "quick", "heap"
 };
 
-static void run_sort_bench(json_buf *out, const size_t *sizes, size_t size_count)
+static void run_sort_bench(json_buf *out, const size_t *sizes, size_t size_count,
+                           const char *input_type, int repeats)
 {
     for (size_t s = 0; s < size_count; s++) {
         size_t n = sizes[s];
@@ -68,33 +80,36 @@ static void run_sort_bench(json_buf *out, const size_t *sizes, size_t size_count
             free(work);
             return;
         }
-        fill_random(source, n);
+        fill_input(source, n, input_type);
 
         for (size_t a = 0; a < sizeof(SORT_NAMES) / sizeof(SORT_NAMES[0]); a++) {
             const char *name = SORT_NAMES[a];
-            memcpy(work, source, n * sizeof(int));
-
             Recorder r;
-            recorder_init(&r);
-
-            Timer t;
-            timer_start(&t);
-            sorting_run(name, work, n, &r);
-            double ms = timer_stop_ms(&t);
+            double total_ms = 0.0;
+            for (int repeat = 0; repeat < repeats; repeat++) {
+                memcpy(work, source, n * sizeof(int));
+                recorder_init(&r);
+                Timer t;
+                timer_start(&t);
+                sorting_run(name, work, n, &r);
+                total_ms += timer_stop_ms(&t);
+            }
 
             double n2 = (double)n * (double)n;
             double nlogn = (double)n * log2((double)n > 1.0 ? (double)n : 2.0);
 
             json_begin_object(out, NULL);
             json_add_string(out, "algorithm", name);
+            json_add_string(out, "input_type", input_type);
             json_add_int(out, "size", (long long)n);
+            json_add_int(out, "repeats", repeats);
             json_add_int(out, "operations", r.ops);
             json_add_int(out, "comparisons", r.comparisons);
             json_add_int(out, "swaps", r.swaps);
             json_add_int(out, "writes", r.writes);
             json_add_double(out, "ops_over_n2", (double)r.ops / n2);
             json_add_double(out, "ops_over_nlogn", (double)r.ops / nlogn);
-            json_add_double(out, "time_ms", ms);
+            json_add_double(out, "time_ms", total_ms / (double)repeats);
             json_end_object(out);
         }
         free(source);
@@ -154,12 +169,20 @@ static void run_recursion_bench(json_buf *out, const size_t *sizes, size_t size_
 int algo_benchmark_handle(const char *body, json_buf *out, int *status)
 {
     char family[32] = {0};
+    char input_type[16] = "random";
+    long long repeat_value = 3;
     size_t *sizes = NULL;
     size_t n_sizes = 0;
     int handled = 1;
 
     if (body == NULL ||
         minijson_find_value(body, "family", family, sizeof(family)) != 0) {
+        return 0;
+    }
+    (void)minijson_find_value(body, "input_type", input_type, sizeof(input_type));
+    (void)minijson_extract_int(body, "repeats", &repeat_value);
+    if ((strcmp(input_type, "random") != 0 && strcmp(input_type, "sorted") != 0 &&
+         strcmp(input_type, "reverse") != 0) || repeat_value < 1 || repeat_value > 10) {
         return 0;
     }
 
@@ -189,6 +212,8 @@ int algo_benchmark_handle(const char *body, json_buf *out, int *status)
     json_init(out);
     json_begin_object(out, NULL);
     json_add_string(out, "family", family);
+    json_add_string(out, "input_type", input_type);
+    json_add_int(out, "repeats", repeat_value);
     json_begin_array(out, "sizes");
     for (size_t i = 0; i < n_sizes; i++) {
         json_add_int(out, NULL, (long long)sizes[i]);
@@ -197,7 +222,7 @@ int algo_benchmark_handle(const char *body, json_buf *out, int *status)
     json_begin_array(out, "rows");
 
     if (strcmp(family, "sorting") == 0) {
-        run_sort_bench(out, sizes, n_sizes);
+        run_sort_bench(out, sizes, n_sizes, input_type, (int)repeat_value);
     } else if (strcmp(family, "recursion") == 0) {
         run_recursion_bench(out, sizes, n_sizes);
     } else {

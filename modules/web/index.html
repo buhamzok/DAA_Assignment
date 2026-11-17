@@ -14,6 +14,7 @@
 
 <nav>
   <button data-panel="recursion" class="active">Recursion</button>
+  <button data-panel="structures">Data Structures</button>
   <button data-panel="sorting">Sorting</button>
   <button data-panel="benchmark">Benchmark</button>
 </nav>
@@ -25,9 +26,11 @@
     <label>Algorithm
       <select name="algorithm">
         <option value="factorial">factorial (n!)</option>
+        <option value="factorial_iterative">factorial, iterative</option>
         <option value="fibonacci">fibonacci, naive recursion</option>
         <option value="fibonacci_memo">fibonacci, memoization</option>
-        <option value="hanoi">towers of hanoi (move count)</option>
+        <option value="fibonacci_bottom_up">fibonacci, bottom-up dynamic programming</option>
+        <option value="hanoi">towers of hanoi (moves and animation trace)</option>
       </select>
     </label>
     <label>n
@@ -36,6 +39,48 @@
     <button type="submit">Run</button>
   </form>
   <div id="recursion-result" class="result"></div>
+</section>
+
+<!-- Data structures panel -->
+<section id="panel-structures" class="panel">
+  <h2>Data Structures Lab</h2>
+  <p>Choose a structure, enter a value, then use an operation. The current contents are redrawn after every action.</p>
+  <form id="form-structures">
+    <label>Structure
+      <select name="structure">
+        <option value="stack">stack (fixed capacity)</option>
+        <option value="queue">linear queue</option>
+        <option value="circular">circular queue</option>
+        <option value="singly">singly linked list</option>
+        <option value="doubly">doubly linked list</option>
+      </select>
+    </label>
+    <label>Value
+      <input type="number" name="value" value="10" required>
+    </label>
+    <label>Operation
+      <select name="operation">
+        <option value="insert_end">insert / enqueue / push</option>
+        <option value="remove_front">remove / dequeue / pop</option>
+        <option value="peek">peek / front</option>
+        <option value="search">search value</option>
+        <option value="insert_front">insert at beginning</option>
+        <option value="remove_end">remove at end</option>
+        <option value="reverse">reverse display</option>
+        <option value="reset">reset structure</option>
+      </select>
+    </label>
+    <button type="submit">Apply</button>
+  </form>
+  <div id="structures-result" class="result"></div>
+  <h3>Balanced-brackets application</h3>
+  <form id="form-brackets">
+    <label>Expression
+      <input type="text" name="expression" value="{([])}" required>
+    </label>
+    <button type="submit">Check brackets</button>
+  </form>
+  <div id="brackets-result" class="result"></div>
 </section>
 
 <!-- Sorting panel -->
@@ -48,7 +93,8 @@
         <option value="insertion">insertion sort</option>
         <option value="selection">selection sort</option>
         <option value="merge">merge sort</option>
-        <option value="quick">quick sort</option>
+        <option value="quick">quick sort (first-element pivot)</option>
+        <option value="quick_random">quick sort (randomized pivot)</option>
         <option value="heap">heap sort</option>
       </select>
     </label>
@@ -63,7 +109,7 @@
 <!-- Benchmark panel -->
 <section id="panel-benchmark" class="panel">
   <h2>Benchmark</h2>
-  <p>Runs the algorithms on random inputs of growing size and measures operations and wall clock time.</p>
+  <p>Runs controlled experiments on random, sorted, or reverse-sorted inputs and reports average time across repeated runs.</p>
   <form id="form-benchmark">
     <label>Family
       <select name="family">
@@ -72,7 +118,17 @@
       </select>
     </label>
     <label>Sizes (comma separated)
-      <input type="text" name="sizes" value="100,200,400" required>
+      <input type="text" name="sizes" value="100,500,1000,2000,5000,10000" required>
+    </label>
+    <label>Input type
+      <select name="input_type">
+        <option value="random">random</option>
+        <option value="sorted">already sorted</option>
+        <option value="reverse">reverse sorted</option>
+      </select>
+    </label>
+    <label>Repeated runs
+      <input type="number" name="repeats" min="1" max="10" value="3" required>
     </label>
     <button type="submit">Benchmark</button>
   </form>

@@ -11,8 +11,10 @@
  */
 
 long long recursion_factorial(Recorder *r, long long n);
+long long recursion_factorial_iterative(Recorder *r, long long n);
 long long recursion_fib_naive(Recorder *r, long long n);
 long long recursion_fib_memo(Recorder *r, long long n);
+long long recursion_fib_bottom_up(Recorder *r, long long n);
 long long recursion_hanoi(Recorder *r, long long n);
 int algo_recursion_handle(const char *body, json_buf *out, int *status);
 
